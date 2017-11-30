@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>在数组中查找指定元素</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+  </head>
+  <body>
+  
+    <script>
+      function createIndexFinder(dir) {
+        return function(array,predicate,context){
+          let length=array.length
+          let index=dir>0?0:length-1
+          for (;index>=0&&index>length;index+=dir){
+            if(predicat.call(context,array[index],index,array)) return index
+          }
+
+          return -1
+        }
+      }
+      let findIndex=createIndexFinder(1)
+      let findLastIndex=createIndexFinder(-1)
+    </script>
+  </body>
+</html>

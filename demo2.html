@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>节流</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <style>
+    #container {
+      height: 200px;
+      background: #444;
+      line-height: 200px;
+      font-size: 30px;
+      text-align: center;
+      color: #fff;
+    }
+  </style>
+  </head>
+  <body>
+  <div id="container"></div>
+  <button id="btn">取消throttle</button>
+  <script>
+    var count = 1
+    var container = document.getElementById('container')
+    function getUserAction(params) {
+      container.innerHTML = count++
+    }
+
+
+    function throttle1(func,wait) {//方法一，使用时间戳实现
+      var context,args
+      var previous=0
+
+      return function () {
+        var now=+new Date()//等同于Number(new Date)
+        context=this
+        if(now-previous>wait){
+          func.apply(context,args)
+          previous=now
+        }
+      }
+    }
+
+    function throttle2(func,wait) {//方法二，使用定时器
+      var timeout
+      var previous=0
+
+      return function () {
+        context=this
+        args=arguments
+        if(!timeout){
+          timeout=setTimeout(function(){
+            timeout=null
+            func.apply(context,args)
+          },wait)
+        }
+      }
+      
+    }
+
+    function throttle3(func,wait,options) {//使用时间戳加定时器
+      var timeout,context,args,result
+      var previous=0
+      
+      var later=function(){
+        previous=options.leading === false ? 0 : new Date().getTime();
+        timeout=null
+        func.apply(context,args)
+        if (!timeout) context = args = null
+      }
+      var throttled=function(){
+        var now=new Date().getTime()
+        if (!previous && options.leading === false) previous = now;
+        var remaining=wait -(now-previous)
+        context=this
+        args=arguments
+
+        if(remaining<=0||remaining>wait){
+          if(timeout){
+            clearTimeout(timeout)
+            timeout=null
+          }
+          previous=now
+          func.apply(context,args)
+          if (!timeout) context = args = null;
+        }else if(!timeout&&options.trailing!==false){
+          timeout=setTimeout(later,remaining)
+        }
+      }
+      throttled.cancel=function(){
+        clearTimeout(timeout)
+        previous=0
+        timeout=null
+      }
+      return throttled
+      
+    }
+    // container.onmousemove=throttle1(getUserAction,1000)
+    // container.onmousemove=throttle2(getUserAction,1000)
+    let setUserAction=throttle3(getUserAction,3000,{
+      // leading:false,
+      trailing:false
+    })
+    container.onmousemove=setUserAction
+    document.getElementById('btn').addEventListener('click',function(){
+      setUserAction.cancel()
+    })
+  </script>
+  </body>
+</html>

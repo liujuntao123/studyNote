@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>函数柯里化与偏函数</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link href="css/style.css" rel="stylesheet"> -->
+</head>
+
+<body>
+
+  <script>
+    /* 函数柯里化 */
+
+    //方法一
+    function sub_curry(fn) {
+      let args = [].slice.call(arguments, 1)
+      return function () {
+        return fn.apply(this, args.concat([].slice.call(arguments)))
+      }
+    }
+
+    function curry(fn, length) {
+      length = length || fn.length
+      let slice = Array.prototype.slice
+
+      return function () {
+        if (arguments.length < length) {
+          let combined = [fn].concat(slice.call(arguments))
+          return curry(sub_curry.apply(this, combined), length - arguments.length)
+        } else {
+          return fn.apply(this, arguments)
+        }
+      }
+    }
+
+    //方法二
+    function curry(fn, args) {
+      let length = fn.length
+      args = args || []
+      return function () {
+        let _args = args.slice(0)
+        let arg, i
+        for (i = 0; i < arguments.length; i++) {
+          arg = arguments[i]
+          _args.push(arg)
+        }
+        if (_args.length < length) {
+          return curry.call(this, fn, _args)
+        } else {
+          return fn.apply(this, _args)
+        }
+      }
+    }
+    let fn = curry(function (a, b, c) {
+      return [a, b, c]
+    })
+
+    // console.log(fn(1, 2, 3))
+    // console.log(fn(1, 2)(3))
+    // console.log(fn(1)(2)(3))
+    // console.log(fn(1)(2, 3))\
+
+
+    /* 偏函数 */
+    function partial(fn) {
+      let args = [].slice.call(arguments, 1)
+      return function () {
+        let newArgs = args.concat([].slice.call(arguments))
+        return fn.apply(this, newArgs)
+      }
+    }
+
+    function add(a, b) {
+      return a + b + this.value
+    }
+    let addOne = partial(add, 1)
+    let value = 1
+    let obj = {
+      value: 2,
+      addOne
+    }
+    console.log(obj.addOne(2))
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>惰性函数、函数组合、函数记忆</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+  </head>
+  <body>
+  
+    <script>
+      
+      //惰性函数
+      //当我们每次都需要进行条件判断，其实只需要判断一次，接下来的使用方式都不会发生改变的时候，想想是否可以考虑使用惰性函数。
+      let lazy=function(){
+        let t=new Date()
+        lazy=function(){
+          return t
+        }
+        return lazy()
+      }
+
+      //组合函数
+      //利用 compose 将两个函数组合成一个函数，让代码从右向左运行，而不是由内而外运行，可读性大大提升
+      function compose() {
+        let args=arguments
+        let start=args.length-1
+        return function () {
+          let i=start
+          let result=args[start].apply(this,arguments)
+          while (i--) result=args[i].call(this,result)
+          return result
+        }
+      }
+
+      //函数记忆
+      //函数记忆是指将上次的计算结果缓存起来，当下次调用时，如果遇到相同的参数，就直接返回缓存中的数据。
+      //原理上只用把参数和对应的结果数据存到一个对象中，调用时，判断参数对应的数据是否存在，存在就返回对应的结果数据。
+      function memoize(f) {
+        let cache={}
+        return function () {
+          let key=arguments.length+Array.prototype.join.call(arguments,',')
+          if(key in cache){
+            return cache[key]
+          }else{
+            return cache[key]=f.apply(this,arguments)
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

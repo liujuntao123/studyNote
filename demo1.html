@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>防抖</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link href="css/style.css" rel="stylesheet"> -->
+  <style>
+    #container {
+      height: 200px;
+      background: #444;
+      line-height: 200px;
+      font-size: 30px;
+      text-align: center;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <button id="btn">取消debounce</button>
+  <script>
+    var count = 1
+    var container = document.getElementById('container')
+
+    function getUserAction(params) {
+      container.innerHTML = count++
+    }
+
+    function debounce(func, wait, immediate) {
+      var timeout, result;
+
+      var debounced=function () {
+        var context=this
+        var args=arguments
+        if (timeout) clearTimeout(timeout)
+
+        if (immediate) {
+          var callNow = !timeout
+          timeout = setTimeout(function () {
+            timeout = null
+          }, wait)
+          if (callNow) result=func.apply(context, args)
+        } else {
+          timeout = setTimeout(function () {
+            func.apply(context, args)
+          }, wait)
+        }
+        return result
+      }
+
+      debounced.cancel=function(){
+        clearTimeout(timeout)
+        timeout=null
+      }
+
+      return debounced
+
+      // return function () {
+      //   var context = this
+      //   var args = arguments
+
+      //   if (timeout) clearTimeout(timeout)
+
+      //   if (immediate) {
+      //     var callNow = !timeout
+      //     timeout = setTimeout(function () {
+      //       timeout = null
+      //     }, wait)
+      //     if (callNow) result=func.apply(context, args)
+      //   } else {
+      //     timeout = setTimeout(function () {
+      //       func.apply(context, args)
+      //     }, wait)
+      //   }
+      //   return result
+      // }
+    }
+    // container.onmousemove=getUserAction
+    var setUseAction=debounce(getUserAction,1000,true)
+    container.onmouseover=setUseAction
+    document.getElementById('btn').addEventListener('click',function () {
+      setUseAction.cancel()
+    })
+    // container.onmousemove = debounce(getUserAction, 1000, false)
+  </script>
+</body>
+
+</html>

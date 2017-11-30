@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>数组去重</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link href="css/style.css" rel="stylesheet"> -->
+</head>
+
+<body>
+
+  <script>
+    function unique1(arr) { //for循环去重
+      var res = []
+      for (var i = 0, arrLen = arr.length; i < arrLen; i++) {
+        for (var j = 0, resLen = res.length; j < resLen; j++) {
+          if (res[j] === arr[i]) {
+            break
+          }
+        }
+        if (j === resLen) {
+          res.push(arr[i])
+        }
+      }
+      return res
+    }
+
+    function unique2(arr) { //for循环加上indexOf去重
+      var res = []
+      for (var i = 0, arrLen = arr.length; i < arrLen; i++) {
+        var current = arr[i]
+        if (res.indexOf(current) === -1) {
+          res.push(current)
+        }
+      }
+      return res
+    }
+
+    function unique3(arr) { //排序后去重,能够增加效率
+      var res = []
+      var sortedArr = arr.concat().sort()
+      var seen
+      for (var i = 0, arrLen = arr.length; i < arrLen; i++) {
+        if (!i || seen !== sortedArr[i]) {
+          res.push(sortedArr[i])
+        }
+        seen = sortedArr[i]
+      }
+      return res
+    }
+
+    function unique4(arr, isSorted, iteratee) { //综合indexOf和排序，且可以传入一个函数对每一项进行重新计算
+      var res = []
+      var seen = []
+      for (var i = 0, len = arr.length; i < len; i++) {
+        var value = arr[i]
+        var computed = iteratee ? iteratee(value, i, arr) : value
+        if (isSorted) {
+          if (!i || seen !== computed) {
+            res.push(value)
+          }
+          seen = computed
+        } else if (iteratee) {
+          if (seen.indexOf(computed) === -1) {
+            seen.push(computed)
+            res.push(value)
+          }
+        } else if (res.indexOf(value) === -1) {
+          res.push(value)
+        }
+      }
+      return res
+    }
+
+    function unique5(arr) { //利用filter函数和indexOf
+      return arr.filter((item, index) => arr.indexOf(item) === index)
+    }
+
+    function unique6(array) { //利用filter函数和排序
+      return array.concat().sort().filter(function (item, index, array) {
+        return !index || item !== array[index - 1]
+      })
+    }
+
+    function unique7(arr) { //利用Object键值对,已经优化，支持对象和字符串的识别
+      var obj = {}
+      return arr.filter(item => obj.hasOwnProperty(typeof item + JSON.stringify(item)) ? false : (obj[typeof item +
+        JSON.stringify(item)] = true))
+    }
+    var unique8 = (arr) => [...new Set(arr)] //利用ES6提供的set类型
+    var arr = [1, 1, '1', '1', null, null, undefined, undefined, new String('1'), new String('1'), /a/, /a/, NaN, NaN];
+    console.log(unique1(arr))
+    console.log(unique2(arr))
+    console.log(unique3(arr))
+    // console.log(unique4(arr))
+    console.log(unique5(arr))
+    console.log(unique6(arr))
+    console.log(unique7(arr))
+    console.log(unique8(arr))
+  </script>
+</body>
+
+</html>
